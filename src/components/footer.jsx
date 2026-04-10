@@ -12,9 +12,8 @@ export default function Footer() {
   };
 
   const openChat = () => {
-    alert("Chat ochiladi (bu yerga real chat ulash mumkin)");
     // bu yerda masalan Telegram, WhatsApp yoki custom chat ulash mumkin
-    // window.open("https://t.me/yourbot", "_blank");
+    window.open("https://t.me/@i_sobirov5", "_blank");
   };
 
   return (
