@@ -12,8 +12,9 @@ export default function Footer() {
   };
 
   const openChat = () => {
+    alert("Chat ochiladi (bu yerga real chat ulash mumkin)");
     // bu yerda masalan Telegram, WhatsApp yoki custom chat ulash mumkin
-    window.open("https://t.me/@i_sobirov5", "_blank");
+    // window.open("https://t.me/yourbot", "_blank");
   };
 
   return (
@@ -38,20 +39,13 @@ export default function Footer() {
           </div>
 
           <div className="flex gap-3">
-            {[
-              { Icon: FaVk, link: "https://vk.com/" },
-              { Icon: FaFacebookF, link: "https://facebook.com/" },
-              { Icon: FaInstagram, link: "https://instagram.com/" }
-            ].map(({ Icon, link }, i) => (
-              <a
+            {[FaVk, FaFacebookF, FaInstagram].map((Icon, i) => (
+              <div
                 key={i}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 cursor-pointer transition-all duration-300 hover:bg-orange-500 hover:text-white hover:border-orange-500"
               >
                 <Icon size={14} />
-              </a>
+              </div>
             ))}
           </div>
         </div>
