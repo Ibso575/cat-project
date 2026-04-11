@@ -1,149 +1,84 @@
-import React, { useEffect, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import api from '../config/axios'; // Sizning axios instansiyangiz
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+import ProductCard from "./products/ProductCard";
+import SkeletonLoader from "./SkeletonLoader";
+import { useGetProductsQuery } from "../store/apis/productsApi";
 
-// Swiper stillari
-import 'swiper/css';
-import 'swiper/css/navigation';
-
-const ProductCard = ({ product }) => {
-  // Backend Schema bo'yicha ma'lumotlarni ajratib olish
-  const name = product?.name;
-  const mainVariant = product?.main_variant;
-  const imageUrl = product?.image_url;
-  
-  // Chegirma foizini hisoblash
-  const discount = (mainVariant?.old_price && mainVariant?.price) 
-    ? Math.round(((mainVariant.old_price - mainVariant.price) / mainVariant.old_price) * 100) 
-    : 0;
-
-  return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 flex flex-col h-full relative group hover:shadow-lg transition-all duration-300">
-      {/* Chegirma belgisi (Aksiya) */}
-      {discount > 0 && (
-        <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-sm z-10">
-          -{discount}%
-        </div>
-      )}
-
-      {/* Rasm qismi */}
-      <div className="h-44 w-full flex items-center justify-center mb-4 p-2 overflow-hidden">
-        <img 
-          src={imageUrl} 
-          alt={name} 
-          className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300" 
-        />
-      </div>
-
-      {/* Mahsulot nomi va og'irligi */}
-      <h3 className="text-sm text-gray-800 line-clamp-2 mb-1 min-h-[2.5rem] leading-tight font-medium">
-        {name}
-      </h3>
-      
-      <div className="text-[11px] text-gray-400 mb-4">
-        {mainVariant?.weight} {mainVariant?.weight_unit}
-      </div>
-
-      {/* Narxlar va Savatcha */}
-      <div className="mt-auto">
-        <div className="flex flex-col mb-3">
-          <span className="text-xl font-black text-red-600 leading-none">
-            {mainVariant?.price} ₽
-          </span>
-          {mainVariant?.old_price && (
-            <span className="text-xs text-gray-400 line-through mt-1 italic">
-              {mainVariant.old_price} ₽
-            </span>
-          )}
-        </div>
-
-        <button className="w-full bg-[#ff9800] text-white py-2.5 rounded-lg font-bold hover:bg-[#e68a00] active:scale-95 transition-all text-sm shadow-md">
-          В корзину
-        </button>
-        
-        <button className="w-full text-[#ff9800] text-[11px] mt-2 font-semibold hover:underline">
-          Купить в 1 клик
-        </button>
-      </div>
-    </div>
-  );
-};
+import "swiper/css";
+import "swiper/css/navigation";
 
 const ProductSlider = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError } = useGetProductsQuery({
+    limit: 10,
+    page: 1,
+  });
+  const products = data?.data || [];
 
-  useEffect(() => {
-    // API'dan ma'lumotlarni xavfsiz olish
-    api.get('/products')
-      .then(response => {
-        // Schema bo'yicha ma'lumot 'data.data' ichida bo'lsa
-        const fetchedData = response.data?.data || response.data;
-        setProducts(Array.isArray(fetchedData) ? fetchedData : []);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Ma'lumot olishda xatolik:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="w-full py-20 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff9800]"></div>
-      </div>
+      <section className="bg-white py-12">
+        <div className="container">
+          <SkeletonLoader count={5} variant="product" />
+        </div>
+      </section>
     );
   }
 
   return (
-    <section className="py-12 bg-white overflow-visible">
-      <div className="container mx-auto px-4 relative">
-        
-        {/* Sarlavha */}
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight text-[32px]">Акции</h2>
-          <button className="text-[#ff9800] flex items-center gap-1 text-sm font-bold hover:gap-2 transition-all">
+    <section className="overflow-visible bg-white py-12">
+      <div className="container relative">
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#ff9800]">
+              Подборка
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900">
+              Популярные товары
+            </h2>
+          </div>
+          <Link
+            to="/products"
+            className="flex items-center gap-1 text-sm font-bold text-[#ff9800] transition hover:gap-2"
+          >
             Смотреть все <ChevronRight size={20} />
-          </button>
+          </Link>
         </div>
 
-        {/* Slider Konteyneri */}
         <div className="relative group">
           <Swiper
             modules={[Navigation]}
             spaceBetween={20}
-            slidesPerView={1.2} // Mobilda keyingi karta qisman ko'rinadi
+            slidesPerView={1.15}
             navigation={{
-              nextEl: '.custom-next',
-              prevEl: '.custom-prev',
+              nextEl: ".custom-next",
+              prevEl: ".custom-prev",
             }}
             breakpoints={{
               640: { slidesPerView: 2.5 },
               1024: { slidesPerView: 4 },
-              1280: { slidesPerView: 5 }, // Skrinshotdagidek 5 ta karta
+              1280: { slidesPerView: 4.5 },
             }}
             className="pb-5"
           >
-            {/* Map'dan oldin products borligini tekshiramiz */}
-            {products && products.length > 0 ? (
+            {products.length > 0 ? (
               products.map((item) => (
                 <SwiperSlide key={item.id} className="h-auto">
                   <ProductCard product={item} />
                 </SwiperSlide>
               ))
             ) : (
-              <div className="text-center w-full py-10 text-gray-400">Mahsulotlar topilmadi.</div>
+              <div className="py-10 text-center text-slate-400">
+                {isError ? "Не удалось загрузить товары." : "Товары не найдены."}
+              </div>
             )}
           </Swiper>
 
-          {/* Navigatsiya tugmalari */}
-          <button className="custom-prev absolute -left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-2xl rounded-full flex items-center justify-center border border-gray-100 opacity-0 group-hover:opacity-100 transition-all hover:text-[#ff9800]">
+          <button className="custom-prev absolute -left-4 top-1/2 z-30 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#eadfcf] bg-white text-slate-700 shadow-xl transition hover:text-[#ff9800] group-hover:flex">
             <ChevronLeft size={28} />
           </button>
-          <button className="custom-next absolute -right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-2xl rounded-full flex items-center justify-center border border-gray-100 opacity-0 group-hover:opacity-100 transition-all hover:text-[#ff9800]">
+          <button className="custom-next absolute -right-4 top-1/2 z-30 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#eadfcf] bg-white text-slate-700 shadow-xl transition hover:text-[#ff9800] group-hover:flex">
             <ChevronRight size={28} />
           </button>
         </div>
