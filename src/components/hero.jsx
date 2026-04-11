@@ -1,8 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import catImg from "../assets/cat.png";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="w-full bg-white py-6 lg:py-20 ">
       <div className="container mx-auto px-4">
@@ -25,7 +28,10 @@ const Hero = () => {
               для котеек.
             </p>
 
-            <button className="bg-white text-[#ff9800] font-bold py-3 px-8 rounded-full flex items-center gap-3 hover:scale-105 transition">
+            <button
+              onClick={() => navigate("/products")}
+              className="bg-white text-[#ff9800] font-bold py-3 px-8 rounded-full flex items-center gap-3 hover:scale-105 transition"
+            >
               Смотреть шампуни
               <ArrowRight size={22} />
             </button>
