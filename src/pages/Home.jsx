@@ -5,6 +5,7 @@ import Vet from '../components/vet';
 import ArticlesSection from '../components/interest';
 import BrandsSection from '../components/brend';
 import Textinfo from '../components/text';
+import SupaTest from '../components/SupaTest';
 
 const Home = () => {
     return (
@@ -15,6 +16,7 @@ const Home = () => {
             <ArticlesSection/>
             <BrandsSection/>
             <Textinfo/>
+           
         </div>
     );
 };

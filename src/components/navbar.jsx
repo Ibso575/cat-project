@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   MapPin, Search, User, ShoppingBasket, Phone, 
   ChevronDown, Menu, X 
 } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 import logo from '../assets/logo.svg';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { totalItems, totalPrice } = useCart();
 
   const topNavItems = [
     { name: 'О нас', active: true },
@@ -44,8 +47,12 @@ const Navbar = () => {
           <nav className="flex-1 flex justify-center">
             <ul className="flex items-center gap-5 whitespace-nowrap">
               {topNavItems.map((item, index) => (
-                <li key={index} className={`cursor-pointer hover:text-[#ff9800] ${item.active ? 'text-[#ff9800] font-medium' : ''}`}>
-                  {item.name}
+                <li key={index} className={`cursor-pointer hover:text-[#ff9800] transition-colors ${item.active ? 'text-[#ff9800] font-medium' : ''}`}>
+                  {item.path ? (
+                    <Link to={item.path}>{item.name}</Link>
+                  ) : (
+                    item.name
+                  )}
                 </li>
               ))}
             </ul>
@@ -82,20 +89,32 @@ const Navbar = () => {
                 <span className="font-medium text-[#222]">Николай</span>
               </button>
               
-              <button className="px-6 py-3 border border-gray-200 rounded-full flex items-center gap-2 relative hover:bg-gray-50 transition-colors">
-                <ShoppingBasket size={22} className="text-[#bfbfbf]" />
-                <span className="absolute top-2 left-7 w-4 h-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold">14</span>
-                <span className="font-medium text-[#222]">6800 P</span>
-              </button>
+              <Link to="/cart" className="px-6 py-3 border border-gray-200 rounded-full flex items-center gap-2 relative hover:bg-gray-50 hover:shadow-md active:scale-95 cursor-pointer transition-all duration-200">
+                <div className="relative">
+                  <ShoppingBasket size={22} className="text-[#bfbfbf]" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold px-1">{totalItems}</span>
+                  )}
+                </div>
+                <span className="font-medium text-[#222]">{totalPrice} ₽</span>
+              </Link>
             </div>
 
-            {/* MOBIL HAMBURGER - Har doim eng o'ngda */}
-            <button 
-              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(true)}
-            >
-              <Menu size={30} />
-            </button>
+            {/* MOBIL KORZINKA + HAMBURGER */}
+            <div className="flex lg:hidden items-center gap-2">
+              <Link to="/cart" className="relative p-2 text-gray-600 hover:bg-gray-100 hover:shadow-md active:scale-95 rounded-lg cursor-pointer transition-all duration-200">
+                <ShoppingBasket size={26} className="text-[#bfbfbf]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold px-1">{totalItems}</span>
+                )}
+              </Link>
+              <button 
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(true)}
+              >
+                <Menu size={30} />
+              </button>
+            </div>
           </div>
 
         </div>
@@ -106,8 +125,13 @@ const Navbar = () => {
         <div className="container mx-auto px-4">
           <ul className="flex items-center justify-between text-[#4d4d4d] whitespace-nowrap">
             {categoryItems.map((item, index) => (
-              <li key={index} className="cursor-pointer py-2 px-1 hover:text-[#316c8c] transition-colors flex items-center gap-1.5">
-                {item}
+              <li key={index} className="py-2 px-1 flex items-center gap-1.5">
+                <Link
+                  to={item === 'Акции' ? '/sales' : `/catalog?category=${encodeURIComponent(item)}`}
+                  className="hover:text-[#ff9800] transition-colors cursor-pointer"
+                >
+                  {item}
+                </Link>
                 {item === 'Акции' && <span className="w-2.5 h-2.5 bg-[#ff9800] rounded-full"></span>}
               </li>
             ))}
@@ -148,9 +172,15 @@ const Navbar = () => {
               <h3 className="font-bold text-lg mb-4 text-[#316c8c] border-l-4 border-[#316c8c] pl-3">Категории</h3>
               <ul className="space-y-4">
                 {categoryItems.map((item, index) => (
-                  <li key={index} className="flex items-center justify-between text-lg text-gray-700 border-b border-gray-50 pb-2 active:text-[#ff9800]">
-                    {item}
-                    <ChevronDown size={18} className="-rotate-90 text-gray-300" />
+                  <li key={index}>
+                    <Link
+                      to={item === 'Акции' ? '/sales' : `/catalog?category=${encodeURIComponent(item)}`}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center justify-between text-lg text-gray-700 border-b border-gray-50 pb-2 active:text-[#ff9800]"
+                    >
+                      {item}
+                      <ChevronDown size={18} className="-rotate-90 text-gray-300" />
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -159,6 +189,24 @@ const Navbar = () => {
 
           {/* Mobil Footer (Bog'lanish) */}
           <div className="mt-auto pt-6 border-t border-gray-100 space-y-4">
+            <Link
+              to="/cart"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center justify-between bg-[#ff9800] text-white rounded-xl px-5 py-3 font-bold text-base hover:bg-[#e68a00] transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <ShoppingBasket size={22} />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold px-1">
+                      {totalItems}
+                    </span>
+                  )}
+                </div>
+                <span>Корзина</span>
+              </div>
+              <span>{totalPrice} ₽</span>
+            </Link>
             <div className="flex items-center gap-3 text-xl font-bold text-[#ff9800]">
               <Phone /> +7 (3432) 59-49-43
             </div>
