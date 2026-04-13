@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function getProductMeta(product) {
   const variant = product?.main_variant || product?.variants?.[0] || {};
@@ -22,11 +23,12 @@ function getProductMeta(product) {
 }
 
 export default function ProductCard({ product }) {
+  const { t } = useTranslation();
   const { title, imageUrl, price, oldPrice, weight, discount } =
     getProductMeta(product);
 
   return (
-    <article className="group relative flex h-full flex-col border border-[#dedede] bg-white p-0">
+    <article className="group relative flex h-full flex-col border border-[#dedede] dark:border-slate-800 bg-white dark:bg-slate-900 p-0 transition-colors duration-300">
       {discount > 0 ? (
         <div className="absolute left-0 top-0 z-10 bg-[#ff3535] px-3 py-1 text-[12px] font-bold leading-none text-white">
           -{discount}%
@@ -48,7 +50,7 @@ export default function ProductCard({ product }) {
 
       <Link
         to={`/products/${product.id}`}
-        className="mt-4 min-h-[78px] text-[15px] leading-7 text-[#333333] transition hover:text-[#ff8a00]"
+        className="mt-4 min-h-[78px] text-[15px] leading-7 text-[#333333] dark:text-gray-200 transition hover:text-[#ff8a00]"
       >
         {title}
       </Link>
@@ -56,7 +58,7 @@ export default function ProductCard({ product }) {
       {weight ? (
         <button
           type="button"
-          className="mt-3 flex h-[40px] w-full items-center justify-between rounded-[4px] border border-[#d9d9d9] px-3 text-[14px] text-[#444444]"
+          className="mt-3 flex h-[40px] w-full items-center justify-between rounded-[4px] border border-[#d9d9d9] dark:border-slate-700 dark:bg-slate-800 px-3 text-[14px] text-[#444444] dark:text-gray-300 transition-colors"
         >
           <span>{weight}</span>
           <ChevronDown size={16} />
@@ -66,11 +68,11 @@ export default function ProductCard({ product }) {
       )}
 
       <div className="mt-4 flex items-end gap-3">
-        <span className="text-[17px] font-extrabold leading-none text-[#333333]">
+        <span className="text-[17px] font-extrabold leading-none text-[#333333] dark:text-white">
           {price} ₽
         </span>
         {oldPrice ? (
-          <span className="text-[15px] leading-none text-[#9a9a9a] line-through">
+          <span className="text-[15px] leading-none text-[#9a9a9a] dark:text-gray-500 line-through">
             {oldPrice} ₽
           </span>
         ) : null}
@@ -80,13 +82,13 @@ export default function ProductCard({ product }) {
         type="button"
         className="mt-4 h-[40px] rounded-[4px] bg-[#ff9519] text-[14px] font-semibold text-white transition hover:bg-[#ff8400]"
       >
-        В корзину
+        {t('add_to_cart')}
       </button>
       <button
         type="button"
         className="mt-3 text-[14px] text-[#ff9519] transition hover:text-[#ff8400]"
       >
-        Купить в 1 клик
+        {t('buy_one_click')}
       </button>
       </div>
     </article>
