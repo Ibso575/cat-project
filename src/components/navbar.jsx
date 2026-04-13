@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   MapPin, Search, User, ShoppingBasket, Phone, 
-  ChevronDown, Menu, X, Trash2, ShoppingCart,
+  ChevronDown, Menu, X, Trash2, ShoppingCart, ExternalLink,
   Sun, Moon, Globe
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const theme = useSelector(selectTheme);
   const currentLanguage = useSelector(selectLanguage);
   
@@ -103,68 +103,71 @@ const Navbar = () => {
     <header className="w-full font-sans text-xs antialiased relative">
       
       {/* 1. TOP BAR (Desktop only) */}
-      <div className="hidden lg:block bg-[#f2f2f2] dark:bg-slate-950 text-[#4d4d4d] dark:text-gray-400 py-2 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
-        <div className="container flex items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1.5 cursor-pointer">
+      <div className="hidden lg:block bg-[#f3f3f3] dark:bg-slate-950 text-[#4d4d4d] dark:text-gray-400 h-11 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
+        <div className="container flex h-full items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 cursor-pointer text-[14px]">
               <MapPin size={16} className="text-[#bfbfbf] dark:text-gray-500" />
               <span className="dark:text-gray-300">Новый Уренгой</span>
               <ChevronDown size={14} className="text-[#bfbfbf] dark:text-gray-500" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <Phone size={16} className="text-[#ff9800]" />
-              <a href="tel:+73432594943" className="font-medium text-[#222] dark:text-gray-200">+7 (3432) 59-49-43</a>
-            </div>
           </div>
           <nav className="flex-1 flex justify-center">
-            <ul className="flex items-center gap-5 whitespace-nowrap">
+            <ul className="flex items-center gap-8 whitespace-nowrap">
               {topNavItems.map((item, index) => (
-                <li key={index} className={`cursor-pointer hover:text-[#ff9800] transition-colors ${item.active ? 'text-[#ff9800] font-medium' : ''}`}>
-                  {t(item.key)}
+                <li key={index} className={`flex items-center gap-1 cursor-pointer text-[14px] hover:text-[#ff9800] transition-colors ${item.active ? 'text-[#ff9800] font-medium' : ''}`}>
+                  <span>{t(item.key)}</span>
+                  {item.isDropdown ? <ChevronDown size={14} className="text-[#b8b8b8]" /> : null}
                 </li>
               ))}
             </ul>
           </nav>
-          <button className="text-[#ff9800] font-medium hover:underline transition-colors">{t('order_call')}</button>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-1.5 text-[14px]">
+              <Phone size={16} className="text-[#ff9800]" />
+              <a href="tel:+73432594943" className="font-medium text-[#222] dark:text-gray-200">+7 (3432) 59-49-43</a>
+            </div>
+            <button className="text-[#d8921e] text-[22px] leading-none font-medium hover:text-[#ff9800] transition-colors">{t('order_call')}</button>
+          </div>
         </div>
       </div>
 
       {/* 2. MAIN NAVBAR */}
-      <div className="bg-white dark:bg-slate-900 py-3 lg:py-4 shadow-sm transition-colors duration-300 relative z-40">
+      <div className="bg-white dark:bg-slate-900 py-2.5 lg:py-3 transition-colors duration-300 relative z-40">
         <div className="container flex items-center justify-between">
           
           {/* LOGO */}
-          <div className="flex-shrink-0 cursor-pointer">
+          <div className="shrink-0 cursor-pointer">
             <a href="/">
-            <img src={logo} alt="Logo" className="h-9 lg:h-14 w-auto" />
+            <img src={logo} alt="Logo" className="h-9 lg:h-16 w-auto" />
             </a>
           </div>
 
-          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 mx-10 relative max-w-2xl">
+          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 mx-8 relative max-w-[560px]">
             <input 
               type="search" 
               placeholder="Поиск товаров" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#f9f9f9] dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-full pl-6 pr-12 py-3 text-sm focus:outline-none focus:border-[#ff9800] dark:focus:border-[#ff9800] dark:text-white transition-colors duration-300"
+              className="w-full h-12 bg-white dark:bg-slate-950 border border-[#d9d9d9] dark:border-slate-800 rounded-[4px] pl-5 pr-12 text-[22px] leading-none focus:outline-none focus:border-[#ff9800] dark:focus:border-[#ff9800] dark:text-white transition-colors duration-300"
             />
-            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#4d4d4d] dark:text-gray-500 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors"><Search size={20} /></button>
+            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#b3b3b3] dark:text-gray-500 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors"><Search size={20} /></button>
           </form>
 
           {/* RIGHT SIDE */}
           <div className="flex items-center gap-4">
             {/* Desktop buttons */}
-            <div className="hidden lg:flex items-center gap-4">
-              <button className="px-6 py-3 border border-gray-200 dark:border-slate-700 rounded-full flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+            <div className="hidden lg:flex items-center gap-3">
+              <button className="px-5 h-12 border border-[#dedede] dark:border-slate-700 rounded-[6px] flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                 <User size={22} className="text-[#bfbfbf] dark:text-gray-500" />
-                <span className="font-medium text-[#222] dark:text-gray-200">Николай</span>
+                <span className="font-medium text-[#222] dark:text-gray-200 text-[22px] leading-none">Николай</span>
               </button>
               
               {/* CART BUTTON */}
               <div className="relative" ref={cartRef}>
                 <button
                   onClick={() => setIsCartOpen((prev) => !prev)}
-                  className="px-6 py-3 border border-gray-200 dark:border-slate-700 rounded-full flex items-center gap-2 relative hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                  className="px-5 h-12 border border-[#dedede] dark:border-slate-700 rounded-[6px] flex items-center gap-2 relative hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   <ShoppingBasket size={22} className="text-[#bfbfbf] dark:text-gray-500" />
                   {cartCount > 0 && (
@@ -172,7 +175,7 @@ const Navbar = () => {
                       {cartCount}
                     </span>
                   )}
-                  <span className="font-medium text-[#222] dark:text-gray-100">
+                  <span className="font-medium text-[#222] dark:text-gray-100 text-[22px] leading-none">
                     {cartTotal > 0 ? `${cartTotal.toLocaleString()} ₽` : t('cart')}
                   </span>
                 </button>
@@ -286,13 +289,13 @@ const Navbar = () => {
               {/* THEME TOGGLE */}
               <button
                 onClick={() => dispatch(toggleTheme())}
-                className="w-10 h-10 border border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center text-gray-400 hover:text-[#ff9800] hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-300"
+                className="hidden"
               >
                 {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
               </button>
 
               {/* LANGUAGE SWITCHER */}
-              <div className="relative" ref={langRef}>
+              <div className="relative hidden" ref={langRef}>
                 <button
                   onClick={() => setIsLangOpen(!isLangOpen)}
                   className="px-3 h-10 border border-gray-200 dark:border-slate-700 rounded-full flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-300"
@@ -330,18 +333,19 @@ const Navbar = () => {
       </div>
 
       {/* 3. CATEGORIES BAR (Desktop only) */}
-      <div className="hidden lg:block bg-white dark:bg-slate-900 pb-3 border-b border-gray-100 dark:border-slate-800 transition-colors duration-300 relative z-30">
+      <div className="hidden lg:block bg-white dark:bg-slate-900 pb-2 border-b border-gray-100 dark:border-slate-800 transition-colors duration-300 relative z-30">
         <div className="container">
-          <ul className="flex items-center justify-between text-[#4d4d4d] dark:text-gray-300 whitespace-nowrap">
+          <ul className="flex items-center justify-between text-[#2f2f2f] dark:text-gray-300 whitespace-nowrap">
             {categoryItems.map((item, index) => (
               <li key={index} className="flex items-center gap-1.5">
                 <Link
                   to={item.path}
-                  className="cursor-pointer py-2 px-1 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors uppercase tracking-wide font-bold text-[11px]"
+                  className="cursor-pointer py-2 px-1 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors text-[22px] leading-none"
                 >
                   {item.label}
                 </Link>
                 {item.key === 'promotions' && <span className="w-2.5 h-2.5 bg-[#ff9800] rounded-full animate-pulse"></span>}
+                {item.key === 'vetclinic' && <ExternalLink size={14} className="text-[#ff9800]" />}
               </li>
             ))}
           </ul>

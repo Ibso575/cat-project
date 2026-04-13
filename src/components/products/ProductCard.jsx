@@ -1,42 +1,56 @@
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../store/cartSlice";
 
-function getProductMeta(product) {
-  const variant = product?.main_variant || product?.variants?.[0] || {};
+const fallbackImage = "https://placehold.co/600x600/f6f6f6/8b8b8b?text=No+Image";
+
+function getCardData(product = {}) {
+  const variant = product.main_variant || product.variants?.[0] || {};
+  const price = variant.price ?? product.min_price ?? 0;
+  const oldPrice = variant.old_price ?? null;
+
   const discount =
-    variant?.old_price && variant?.price
-      ? Math.round(((variant.old_price - variant.price) / variant.old_price) * 100)
+    oldPrice && price && oldPrice > price
+      ? Math.round(((oldPrice - price) / oldPrice) * 100)
       : 0;
 
   return {
-    title: product?.name || "Товар",
-    imageUrl: product?.image_url || "",
-    price: variant?.price || product?.min_price || 0,
-    oldPrice: variant?.old_price || null,
-    weight:
-      variant?.weight && variant?.weight_unit
-        ? `${variant.weight} ${variant.weight_unit}`
-        : null,
+    id: product.id,
+    title: product.name || "Товар",
+    imageUrl: product.image_url || variant.image_url || fallbackImage,
+    price,
+    oldPrice,
+    weight: variant.weight && variant.weight_unit ? `${variant.weight} ${variant.weight_unit}` : "",
     discount,
   };
 }
 
 export default function ProductCard({ product }) {
   const { t } = useTranslation();
-  const { title, imageUrl, price, oldPrice, weight, discount } =
-    getProductMeta(product);
+  const dispatch = useDispatch();
+  const { id, title, imageUrl, price, oldPrice, weight, discount } = getCardData(product);
+
+  const handleAddToCart = () => {
+    if (!id) return;
+
+    dispatch(
+      addToCart({
+        id,
+        name: title,
+        price,
+        imageUrl,
+      }),
+    );
+  };
 
   return (
     <article className="group relative flex h-full flex-col border border-[#dedede] dark:border-slate-800 bg-white dark:bg-slate-900 p-0 transition-colors duration-300">
-      {discount > 0 ? (
-        <div className="absolute left-0 top-0 z-10 bg-[#ff3535] px-3 py-1 text-[12px] font-bold leading-none text-white">
-          -{discount}%
-        </div>
-      ) : null}
+      {discount > 0 && <div className="absolute left-0 top-0 z-10 bg-[#ff3535] px-3 py-1 text-[12px] font-bold leading-none text-white">-{discount}%</div>}
 
       <Link
-        to={`/products/${product.id}`}
+        to={`/products/${id}`}
         className="relative block h-[220px] w-full overflow-hidden"
       >
         <img
@@ -49,7 +63,7 @@ export default function ProductCard({ product }) {
       <div className="flex flex-col flex-grow p-4 pt-2">
 
       <Link
-        to={`/products/${product.id}`}
+        to={`/products/${id}`}
         className="mt-4 min-h-[78px] text-[15px] leading-7 text-[#333333] dark:text-gray-200 transition hover:text-[#ff8a00]"
       >
         {title}
@@ -63,9 +77,7 @@ export default function ProductCard({ product }) {
           <span>{weight}</span>
           <ChevronDown size={16} />
         </button>
-      ) : (
-        <div className="mt-3 h-[40px]" />
-      )}
+      ) : <div className="mt-3 h-[40px]" />}
 
       <div className="mt-4 flex items-end gap-3">
         <span className="text-[17px] font-extrabold leading-none text-[#333333] dark:text-white">
@@ -80,6 +92,7 @@ export default function ProductCard({ product }) {
 
       <button
         type="button"
+        onClick={handleAddToCart}
         className="mt-4 h-[40px] rounded-[4px] bg-[#ff9519] text-[14px] font-semibold text-white transition hover:bg-[#ff8400]"
       >
         {t('add_to_cart')}
