@@ -1,7 +1,7 @@
 import { addToCart, decreaseQuantity, selectCartItems } from "../../store/cartSlice";
 import SkeletonLoader from "../SkeletonLoader";
 import { useTranslation } from "react-i18next";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetProductByIdQuery } from "../../store/apis/productsApi";
 import { ArrowLeft, Star, Truck, ShieldCheck, RotateCcw, ShoppingCart, Minus, Plus, Heart } from "lucide-react";
@@ -34,6 +34,7 @@ export default function ProductDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { data: responseData, isLoading, error } = useGetProductByIdQuery(id, {
     skip: !id,
   });
@@ -211,10 +212,11 @@ export default function ProductDetail() {
 
                 <button
                   type="button"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#eadfcf] dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-800 dark:text-gray-200 transition hover:border-[#ff9800] hover:text-[#ff9800] sm:px-6 sm:py-4 sm:text-base"
+                  disabled={stock === 0}
+                  onClick={() => navigate(`/checkout/${product?.id}`)}
+                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#ff9800] hover:bg-orange-600 px-5 py-3 text-sm font-semibold text-white transition active:scale-95 sm:px-6 sm:py-4 sm:text-base shadow-lg shadow-orange-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <Heart size={18} />
-                  {t('add_to_wishlist')}
+                  🛒 {t('buy_now', { defaultValue: 'Купить сейчас' })}
                 </button>
               </div>
             </div>

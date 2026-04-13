@@ -82,15 +82,15 @@ const Navbar = () => {
   ];
 
   const categoryItems = [
-    { key: 'cats', label: t('cats') },
-    { key: 'dogs', label: t('dogs') },
-    { key: 'rodents', label: t('rodents') },
-    { key: 'birds', label: t('birds') },
-    { key: 'aquarium', label: t('aquarium') },
-    { key: 'vet', label: t('vet') },
-    { key: 'promotions', label: t('promotions') },
-    { key: 'franchise', label: t('franchise') },
-    { key: 'vetclinic', label: t('vetclinic') },
+    { key: 'cats',       label: t('cats'),       path: '/products?category=cats' },
+    { key: 'dogs',       label: t('dogs'),       path: '/products?category=dogs' },
+    { key: 'rodents',    label: t('rodents'),    path: '/products?category=rodents' },
+    { key: 'birds',      label: t('birds'),      path: '/products?category=birds' },
+    { key: 'aquarium',   label: t('aquarium'),   path: '/products?category=aquarium' },
+    { key: 'vet',        label: t('vet'),        path: '/products?category=vet' },
+    { key: 'promotions', label: t('promotions'), path: '/products?category=promotions' },
+    { key: 'franchise',  label: t('franchise'),  path: '/products?category=franchise' },
+    { key: 'vetclinic',  label: t('vetclinic'),  path: '/products?category=vetclinic' },
   ];
 
   const languages = [
@@ -334,8 +334,13 @@ const Navbar = () => {
         <div className="container">
           <ul className="flex items-center justify-between text-[#4d4d4d] dark:text-gray-300 whitespace-nowrap">
             {categoryItems.map((item, index) => (
-              <li key={index} className="cursor-pointer py-2 px-1 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors flex items-center gap-1.5 uppercase tracking-wide font-bold text-[11px]">
-                {item.label}
+              <li key={index} className="flex items-center gap-1.5">
+                <Link
+                  to={item.path}
+                  className="cursor-pointer py-2 px-1 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors uppercase tracking-wide font-bold text-[11px]"
+                >
+                  {item.label}
+                </Link>
                 {item.key === 'promotions' && <span className="w-2.5 h-2.5 bg-[#ff9800] rounded-full animate-pulse"></span>}
               </li>
             ))}
@@ -377,9 +382,15 @@ const Navbar = () => {
               <h3 className="font-bold text-lg mb-4 text-[#316c8c] border-l-4 border-[#316c8c] pl-3">Категории</h3>
               <ul className="space-y-4">
                 {categoryItems.map((item, index) => (
-                  <li key={index} className="flex items-center justify-between text-lg text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-slate-800 pb-2 active:text-[#ff9800] dark:active:text-[#ff9800] transition-colors">
-                    {item.label}
-                    <ChevronDown size={18} className="-rotate-90 text-gray-300 dark:text-gray-600" />
+                  <li key={index}>
+                    <Link
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center justify-between text-lg text-gray-700 dark:text-gray-300 border-b border-gray-50 dark:border-slate-800 pb-2 hover:text-[#ff9800] dark:hover:text-[#ff9800] transition-colors w-full"
+                    >
+                      {item.label}
+                      <ChevronDown size={18} className="-rotate-90 text-gray-300 dark:text-gray-600" />
+                    </Link>
                   </li>
                 ))}
               </ul>
