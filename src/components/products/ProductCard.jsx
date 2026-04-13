@@ -26,23 +26,25 @@ export default function ProductCard({ product }) {
     getProductMeta(product);
 
   return (
-    <article className="group relative flex h-full flex-col border border-[#dedede] bg-white px-4 pb-4 pt-10">
+    <article className="group relative flex h-full flex-col border border-[#dedede] bg-white p-0">
       {discount > 0 ? (
-        <div className="absolute left-0 top-0 bg-[#ff3535] px-3 py-1 text-[12px] font-bold leading-none text-white">
+        <div className="absolute left-0 top-0 z-10 bg-[#ff3535] px-3 py-1 text-[12px] font-bold leading-none text-white">
           -{discount}%
         </div>
       ) : null}
 
       <Link
         to={`/products/${product.id}`}
-        className="flex min-h-[182px] items-center justify-center"
+        className="relative block h-[220px] w-full overflow-hidden"
       >
         <img
           src={imageUrl}
           alt={title}
-          className="max-h-[150px] w-auto max-w-full object-contain transition duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
         />
       </Link>
+      
+      <div className="flex flex-col flex-grow p-4 pt-2">
 
       <Link
         to={`/products/${product.id}`}
@@ -86,6 +88,7 @@ export default function ProductCard({ product }) {
       >
         Купить в 1 клик
       </button>
+      </div>
     </article>
   );
 }

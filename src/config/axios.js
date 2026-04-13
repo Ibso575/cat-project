@@ -1,12 +1,10 @@
 import axios from "axios";
 
-// Deprecated: Use Supabase instead
-const api = axios.create({
-  baseURL: "",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 15000,
-});
+const baseURL = (import.meta.env.VITE_API_URL || "")
+    .replace("/api/docs#", "")
+    .replace(/\/$/, "");
 
+const api = axios.create({
+    baseURL
+});
 export default api;

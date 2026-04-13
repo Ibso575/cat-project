@@ -1,14 +1,8 @@
-import {
-  ArrowLeft,
-  Heart,
-  RotateCcw,
-  ShieldCheck,
-  ShoppingCart,
-  Star,
-  Truck,
-} from "lucide-react";
+import { ArrowLeft, Heart, Minus, Plus, RotateCcw, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { useGetProductByIdQuery } from "../../store/apis/supabaseApi";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetProductByIdQuery } from "../../store/apis/productsApi";
+import { addToCart, decreaseQuantity, selectCartItems } from "../../store/cartSlice";
 import SkeletonLoader from "../SkeletonLoader";
 
 function mapSpecifications(product, variant) {
@@ -37,13 +31,14 @@ function mapSpecifications(product, variant) {
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const {
-    data: product,
-    isLoading,
-    error,
-  } = useGetProductByIdQuery(id, {
+  const dispatch = useDispatch();
+  const { data: product, isLoading, error } = useGetProductByIdQuery(id, {
     skip: !id,
   });
+
+  const cartItems = useSelector(selectCartItems);
+  const cartItem = cartItems.find((item) => item.id === Number(id));
+  const cartQty = cartItem?.quantity || 0;
 
   const variant = product?.variants?.[0] || product?.main_variant || {};
   const title = product?.name || "Товар";
@@ -54,6 +49,15 @@ export default function ProductDetail() {
   const rating = product?.metrics?.rating_avg || 0;
   const reviewsCount = product?.metrics?.reviews_count || 0;
   const specifications = mapSpecifications(product, variant);
+
+  const handleAddToCart = () => {
+    dispatch(addToCart({
+      id: product.id,
+      name: title,
+      price,
+      imageUrl,
+    }));
+  };
 
   return (
     <section className="bg-[#fffaf5] py-5 md:py-12 lg:py-16">
@@ -75,11 +79,11 @@ export default function ProductDetail() {
         ) : (
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
             <div className="rounded-[1.5rem] border border-[#eadfcf] bg-white p-4 shadow-sm sm:rounded-[2rem] sm:p-6 lg:sticky lg:top-28">
-              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-[1.25rem] bg-[#fff8ef] p-5 sm:rounded-[1.75rem] sm:p-8">
+              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-[1.25rem] bg-[#fff8ef] sm:rounded-[1.75rem]">
                 <img
                   src={imageUrl}
                   alt={title}
-                  className="max-h-full max-w-full object-contain"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                 />
               </div>
 
@@ -189,14 +193,37 @@ export default function ProductDetail() {
               ) : null}
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  disabled={stock === 0}
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#ff9800] disabled:cursor-not-allowed disabled:bg-slate-300 sm:px-6 sm:py-4 sm:text-base"
-                >
-                  <ShoppingCart size={18} />
-                  {stock > 0 ? "Добавить в корзину" : "Нет в наличии"}
-                </button>
+                {/* CART BUTTON — with quantity counter */}
+                {cartQty === 0 ? (
+                  <button
+                    type="button"
+                    disabled={stock === 0}
+                    onClick={handleAddToCart}
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#ff9800] disabled:cursor-not-allowed disabled:bg-slate-300 sm:px-6 sm:py-4 sm:text-base"
+                  >
+                    <ShoppingCart size={18} />
+                    {stock > 0 ? "Добавить в корзину" : "Нет в наличии"}
+                  </button>
+                ) : (
+                  <div className="inline-flex min-h-[48px] items-center justify-between gap-3 rounded-full bg-[#ff9800] px-4 py-2 text-white">
+                    <button
+                      type="button"
+                      onClick={() => dispatch(decreaseQuantity(product.id))}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span className="text-base font-bold min-w-[24px] text-center">{cartQty}</span>
+                    <button
+                      type="button"
+                      onClick={handleAddToCart}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                )}
+
                 <button
                   type="button"
                   className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#eadfcf] bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-[#ff9800] hover:text-[#ff9800] sm:px-6 sm:py-4 sm:text-base"

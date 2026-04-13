@@ -1,27 +1,27 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
-import HomePage from "./components/Main/HomePage";
-import ProductListPage from "./components/Main/ProductListPage";
-import ProductDetailPage from "./components/Main/ProductDetailPage";
 
-function AppShell() {
-  return (
-    <div className="min-h-screen bg-[#fffaf5] text-slate-900">
-      <Header />
-      <main>
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import MainLayout from './layout/MainLayout';
+import Home from './pages/Home';
+import ProductList from './pages/ProductList';
+import ProductDetail from './pages/ProductDetail';
+import ProductList2 from './pages/ProductList2';
+import Sales from './pages/Sales';
+
+
+const App = () => {
+    return (
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/" element={<MainLayout />}>
+                <Route index element={<Home />} />
+                <Route path="products" element={<ProductList />} />
+                <Route path="products/:id" element={<ProductDetail />} />
+                <Route path="catalog" element={<ProductList2 />} />
+                <Route path="sales" element={<Sales />} />
+                
+            </Route>
         </Routes>
-      </main>
-      <Footer />
-    </div>
-  );
+    );
 }
 
-export default function App() {
-  return <AppShell />;
-}
+export default App;

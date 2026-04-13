@@ -1,24 +1,8 @@
 @import "tailwindcss";
 
-@layer {
-  html {
-    @apply overflow-x-hidden;
-  }
-
-  :root {
-    color: #0f172a;
-    background: #fffaf5;
-  }
-
-  body {
-    @apply m-0 overflow-x-hidden bg-[#fffaf5] font-sans text-slate-900 antialiased;
-  }
-
-  #root {
-    @apply min-h-screen overflow-x-hidden;
-  }
-
-  .container {
-    @apply mx-auto w-full max-w-[1178px] px-[16px];
-  }
+@utility container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
 }

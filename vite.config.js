@@ -4,4 +4,15 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://e-commerce-api-v4.nt.azimumarov.uz',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 });
