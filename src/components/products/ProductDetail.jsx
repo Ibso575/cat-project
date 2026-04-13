@@ -34,9 +34,10 @@ export default function ProductDetail() {
   const { t } = useTranslation();
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { data: product, isLoading, error } = useGetProductByIdQuery(id, {
+  const { data: responseData, isLoading, error } = useGetProductByIdQuery(id, {
     skip: !id,
   });
+  const product = responseData?.data || responseData;
 
   const cartItems = useSelector(selectCartItems);
   const cartItem = cartItems.find((item) => item.id === Number(id));
