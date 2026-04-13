@@ -4,17 +4,14 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProductCard from "./products/ProductCard";
 import SkeletonLoader from "./SkeletonLoader";
-import { useGetProductsQuery } from "../store/apis/productsApi";
+import { useGetProductsQuery } from "../store/apis/supabaseApi";
 
 import "swiper/css";
 import "swiper/css/navigation";
 
 const ProductSlider = () => {
-  const { data, isLoading, isError } = useGetProductsQuery({
-    limit: 10,
-    page: 1,
-  });
-  const products = data?.data || [];
+  const { data, isLoading, isError } = useGetProductsQuery();
+  const products = data || [];
 
   if (isLoading) {
     return (
@@ -70,7 +67,9 @@ const ProductSlider = () => {
               ))
             ) : (
               <div className="py-10 text-center text-slate-400">
-                {isError ? "Не удалось загрузить товары." : "Товары не найдены."}
+                {isError
+                  ? "Не удалось загрузить товары."
+                  : "Товары не найдены."}
               </div>
             )}
           </Swiper>

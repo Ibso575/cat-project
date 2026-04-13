@@ -1,6 +1,14 @@
-import { ArrowLeft, Heart, RotateCcw, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
+import {
+  ArrowLeft,
+  Heart,
+  RotateCcw,
+  ShieldCheck,
+  ShoppingCart,
+  Star,
+  Truck,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { useGetProductByIdQuery } from "../../store/apis/productsApi";
+import { useGetProductByIdQuery } from "../../store/apis/supabaseApi";
 import SkeletonLoader from "../SkeletonLoader";
 
 function mapSpecifications(product, variant) {
@@ -29,7 +37,11 @@ function mapSpecifications(product, variant) {
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { data: product, isLoading, error } = useGetProductByIdQuery(id, {
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useGetProductByIdQuery(id, {
     skip: !id,
   });
 
@@ -103,7 +115,9 @@ export default function ProductDetail() {
                     <Star size={14} className="fill-current sm:h-4 sm:w-4" />
                     {rating ? rating.toFixed(1) : "Новый"}
                   </div>
-                  <p className="text-xs text-slate-500 sm:text-sm">{reviewsCount} отзывов</p>
+                  <p className="text-xs text-slate-500 sm:text-sm">
+                    {reviewsCount} отзывов
+                  </p>
                 </div>
               </div>
 
@@ -127,28 +141,44 @@ export default function ProductDetail() {
               <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
                 <div className="rounded-[1.25rem] border border-[#eadfcf] bg-white p-3 text-center shadow-sm sm:rounded-[1.5rem] sm:p-4">
                   <Truck className="mx-auto mb-2 text-[#ff9800]" size={22} />
-                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">Быстрая доставка</p>
+                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">
+                    Быстрая доставка
+                  </p>
                 </div>
                 <div className="rounded-[1.25rem] border border-[#eadfcf] bg-white p-3 text-center shadow-sm sm:rounded-[1.5rem] sm:p-4">
-                  <ShieldCheck className="mx-auto mb-2 text-[#ff9800]" size={22} />
-                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">Контроль качества</p>
+                  <ShieldCheck
+                    className="mx-auto mb-2 text-[#ff9800]"
+                    size={22}
+                  />
+                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">
+                    Контроль качества
+                  </p>
                 </div>
                 <div className="rounded-[1.25rem] border border-[#eadfcf] bg-white p-3 text-center shadow-sm sm:rounded-[1.5rem] sm:p-4">
-                  <RotateCcw className="mx-auto mb-2 text-[#ff9800]" size={22} />
-                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">Удобный возврат</p>
+                  <RotateCcw
+                    className="mx-auto mb-2 text-[#ff9800]"
+                    size={22}
+                  />
+                  <p className="text-xs font-semibold text-slate-800 sm:text-sm">
+                    Удобный возврат
+                  </p>
                 </div>
               </div>
 
               {specifications.length > 0 ? (
                 <div className="rounded-[1.5rem] border border-[#eadfcf] bg-white p-4 shadow-sm sm:rounded-[2rem] sm:p-6">
-                  <h2 className="text-base font-bold text-slate-900 sm:text-lg">Характеристики</h2>
+                  <h2 className="text-base font-bold text-slate-900 sm:text-lg">
+                    Характеристики
+                  </h2>
                   <div className="mt-4 space-y-3">
                     {specifications.map((specification, index) => (
                       <div
                         key={`${specification.label}-${index}`}
                         className="flex items-start justify-between gap-4 border-b border-[#f4ecdf] pb-3 text-xs sm:text-sm last:border-b-0 last:pb-0"
                       >
-                        <span className="text-slate-500">{specification.label}</span>
+                        <span className="text-slate-500">
+                          {specification.label}
+                        </span>
                         <span className="text-right font-semibold text-slate-800">
                           {specification.value}
                         </span>
@@ -171,8 +201,7 @@ export default function ProductDetail() {
                   type="button"
                   className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#eadfcf] bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-[#ff9800] hover:text-[#ff9800] sm:px-6 sm:py-4 sm:text-base"
                 >
-                  <Heart size={18} />
-                  В избранное
+                  <Heart size={18} />В избранное
                 </button>
               </div>
             </div>

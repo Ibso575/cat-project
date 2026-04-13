@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -8,10 +8,7 @@ import {
 } from "lucide-react";
 import ProductCard from "./ProductCard";
 import SkeletonLoader from "../SkeletonLoader";
-import {
-  useGetCategoriesQuery,
-  useGetProductsQuery,
-} from "../../store/apis/productsApi";
+import { useGetProductsQuery } from "../../store/apis/supabaseApi";
 
 const quickTags = ["Влажный", "Сухой", "Холистик", "При аллергии", "Котятам"];
 const activeTags = ["Природные корма", "Консервы", "Взрослые"];
@@ -76,8 +73,7 @@ function FilterSection({ title, items, expandable = false }) {
               className="mt-[2px] h-4 w-4 rounded-[2px] border-[#d0d0d0] accent-[#ff9519]"
             />
             <span>
-              {item.label}{" "}
-              <span className="text-[#9a9a9a]">{item.count}</span>
+              {item.label} <span className="text-[#9a9a9a]">{item.count}</span>
             </span>
           </label>
         ))}
@@ -96,37 +92,16 @@ function FilterSection({ title, items, expandable = false }) {
 }
 
 export default function ProductList() {
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("1");
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedSearch(search.trim());
-      setPage(1);
-    }, 350);
-
-    return () => window.clearTimeout(timer);
-  }, [search]);
-
-  const queryParams = {
-    page,
-    limit: 12,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(selectedCategory ? { category_id: selectedCategory } : {}),
-  };
 
   const {
     data: productsResponse,
     isLoading,
     isFetching,
     error,
-  } = useGetProductsQuery(queryParams);
-  const { data: categories = [] } = useGetCategoriesQuery();
+  } = useGetProductsQuery();
 
-  const products = useMemo(() => productsResponse?.data || [], [productsResponse]);
-  const meta = productsResponse?.meta;
+  const products = useMemo(() => productsResponse || [], [productsResponse]);
 
   const manufacturerItems = useMemo(() => {
     const brandCounts = new Map();
@@ -142,12 +117,12 @@ export default function ProductList() {
     }));
   }, [products]);
 
-  const currentCategoryName =
-    categories.find((category) => String(category.id) === String(selectedCategory))
-      ?.name || "Корм для кошек";
-
-  const totalPages = meta?.total_pages || 1;
-  const pageNumbers = Array.from({ length: Math.min(totalPages, 5) }, (_, index) => index + 1);
+  const currentCategoryName = "Корм для кошек";
+  const totalPages = 1;
+  const pageNumbers = Array.from(
+    { length: Math.min(totalPages, 5) },
+    (_, index) => index + 1,
+  );
 
   return (
     <section className="bg-white py-8 md:py-10">
@@ -183,7 +158,9 @@ export default function ProductList() {
               <div>
                 <div className="mb-3 flex items-center gap-2">
                   <ChevronDown size={14} className="text-[#333333]" />
-                  <span className="text-[18px] font-semibold text-[#333333]">Цена</span>
+                  <span className="text-[18px] font-semibold text-[#333333]">
+                    Цена
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <input
@@ -207,7 +184,9 @@ export default function ProductList() {
               </div>
 
               <div className="flex max-w-[520px] flex-wrap items-center gap-2">
-                <span className="mr-2 text-[14px] text-[#666666]">Часто ищут:</span>
+                <span className="mr-2 text-[14px] text-[#666666]">
+                  Часто ищут:
+                </span>
                 {quickTags.map((tag) => (
                   <button
                     key={tag}
@@ -274,20 +253,6 @@ export default function ProductList() {
                 <SlidersHorizontal size={16} />
                 Фильтры
               </button>
-              <select
-                value={selectedCategory}
-                onChange={(event) => {
-                  setSelectedCategory(event.target.value);
-                  setPage(1);
-                }}
-                className="h-[40px] rounded-[4px] border border-[#dddddd] px-3 text-[14px] text-[#333333]"
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {isLoading || isFetching ? (
@@ -305,39 +270,18 @@ export default function ProductList() {
                 </div>
 
                 <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-[18px] text-[#333333]">
-                  <button
-                    type="button"
-                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                    disabled={page === 1}
-                    className="text-[#333333] disabled:opacity-40"
-                  >
+                  <button type="button" className="text-[#333333]">
                     <ChevronLeft size={18} />
                   </button>
 
-                  {pageNumbers.map((pageNumber) => (
-                    <button
-                      key={pageNumber}
-                      type="button"
-                      onClick={() => setPage(pageNumber)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-[18px] ${
-                        page === pageNumber
-                          ? "bg-[#ff9519] text-white"
-                          : "text-[#333333]"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  ))}
-
-                  {totalPages > 5 ? <span>...</span> : null}
-                  {totalPages > 1 ? <span>{totalPages}</span> : null}
-
                   <button
                     type="button"
-                    onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                    disabled={page >= totalPages}
-                    className="text-[#333333] disabled:opacity-40"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-[18px] bg-[#ff9519] text-white"
                   >
+                    1
+                  </button>
+
+                  <button type="button" className="text-[#333333]">
                     <ChevronRight size={18} />
                   </button>
                 </div>
@@ -355,33 +299,35 @@ export default function ProductList() {
             О кормлении кошек
           </h2>
           <p className="mb-10 text-[15px] leading-7">
-            Знаете ли вы желания и потребности своей кошки? Взяв в дом четвероногого
-            питомца, нужно сразу продумать систему его кормления. Вариантов выбора
-            всего два: обычная «человеческая» еда и специализированный корм.
-            Готовый корм от авторитетных производителей помогает поддерживать
-            сбалансированный рацион и ежедневный уход за питомцем.
+            Знаете ли вы желания и потребности своей кошки? Взяв в дом
+            четвероногого питомца, нужно сразу продумать систему его кормления.
+            Вариантов выбора всего два: обычная «человеческая» еда и
+            специализированный корм. Готовый корм от авторитетных производителей
+            помогает поддерживать сбалансированный рацион и ежедневный уход за
+            питомцем.
           </p>
 
           <h3 className="mb-4 text-[31px] font-semibold text-[#333333]">
             Виды кошачьего корма в магазине «Сытая морда»
           </h3>
           <p className="mb-10 text-[15px] leading-7">
-            Мы предлагаем оптимальный вариант купить корм для кошек в интернет-магазине
-            «Сытая Морда». В каталоге представлены лучшие виды кормов от известных
-            брендов: влажные и сухие, консервированные, лечебные и повседневные.
-            В нашем каталоге вы найдете решения для разных возрастных категорий,
-            образа жизни и индивидуальных потребностей питомцев.
+            Мы предлагаем оптимальный вариант купить корм для кошек в
+            интернет-магазине «Сытая Морда». В каталоге представлены лучшие виды
+            кормов от известных брендов: влажные и сухие, консервированные,
+            лечебные и повседневные. В нашем каталоге вы найдете решения для
+            разных возрастных категорий, образа жизни и индивидуальных
+            потребностей питомцев.
           </p>
 
           <h3 className="mb-4 text-[31px] font-semibold text-[#333333]">
             Купить корм для кошек в Тюмени: быстро, выгодно удобно
           </h3>
           <p className="text-[15px] leading-7">
-            Интернет-магазин «Сытая Морда» дает возможность купить сертифицированный
-            корм для кошек с доставкой. Просто позвоните нам или оставьте заявку,
-            менеджеры компании согласуют удобную дату и время доставки. Посетите
-            наш интернет-магазин и пусть у вашего кота всегда будет сытая и довольная
-            морда.
+            Интернет-магазин «Сытая Морда» дает возможность купить
+            сертифицированный корм для кошек с доставкой. Просто позвоните нам
+            или оставьте заявку, менеджеры компании согласуют удобную дату и
+            время доставки. Посетите наш интернет-магазин и пусть у вашего кота
+            всегда будет сытая и довольная морда.
           </p>
         </div>
       </div>
