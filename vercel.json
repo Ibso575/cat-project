@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/proxy.js"
+    },
+    {
+      "source": "/:path((?!api).*)*",
+      "destination": "/index.html"
+    }
+  ]
+}
